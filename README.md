@@ -1,120 +1,92 @@
-# Homelab & Development Infrastructure – Overview
+# Homelab & Development Documentation
+
+## Overview
+
+This repository contains the full documentation of the homelab and development
+infrastructure, including **design, operational runbooks, standards, decisions,
+glossary, and changelog**. It provides a single source of truth for setup,
+maintenance, and operational procedures.
 
 ---
 
-**Architecture Version:** 1.0  
-**Status:** Stable  
-**Last Updated:** 2026-01-01
+## Design Documents
+
+High-level architecture, node responsibilities, networking, storage, and
+container strategies.
+
+- [00-Overview](docs/design/00-overview.md) – Homelab & Development Infrastructure Overview
+- [01-Architecture](docs/design/01-architecture.md) – Architecture and High-Level Layout
+- [02-Node Roles](docs/design/02-node-roles.md) – Responsibilities of Lyra, Proxima, Nova, and Rhea
+- [03-Networking](docs/design/03-networking.md) – Network design, addressing, and subnets
+- [04-Storage](docs/design/04-storage.md) – Storage layout, volumes, and disks
+- [05-Container Strategy](docs/design/05-container-strategy.md) – LXC and Docker strategy
+- [06-Security Boundaries](docs/design/06-security-boundaries.md) – Security zones and access
+- [07-Backup & Recovery](docs/design/07-backup-recovery.md) – Backup strategies and recovery
+- [08-Failure Scenarios](docs/design/08-failure-scenarios.md) – Failure handling and mitigation
+- [09-Design Principles](docs/design/09-design-principles.md) – Guiding principles
 
 ---
 
-## 1. Purpose of This Documentation
+## Runbooks
 
-This repository is the **single source of truth** for the homelab and development infrastructure. It defines the architecture, responsibilities, standards, and operational intent of the environment.
+Operational step-by-step guides for each node and service.
 
-The goal of this documentation is to ensure that the system:
+### Proxima (Proxmox)
 
-- Is understandable after long gaps of time
-- Can be rebuilt from first principles
-- Evolves deliberately rather than accidentally
+- [Baseline Setup](docs/runbooks/proxima/baseline-setup.md)
+- [LXC Management](docs/runbooks/proxima/lxc-management.md)
+- [Docker Runtime](docs/runbooks/proxima/docker-runtime.md)
+- [Service Deployment](docs/runbooks/proxima/service-deployment.md)
 
-This documentation is treated as **infrastructure**, not notes.
+### Lyra (Fedora Dev)
 
----
+- [Development Environment](docs/runbooks/lyra/dev-environment.md)
+- [Docker Workflow](docs/runbooks/lyra/docker-workflow.md)
+- [Image Promotion](docs/runbooks/lyra/image-promotion.md)
 
-## 2. Scope
+### Nova (Windows 11)
 
-This documentation covers:
-
-- System architecture and node roles
-- Container and virtualization strategy
-- Development workflow and lifecycle
-- Operational standards and guardrails
-
-This documentation intentionally does **not** include:
-
-- Secrets or credentials
-- Host-specific IP addresses
-- Temporary experiments
-- One-off commands without context
+- [Access and Administration](docs/runbooks/nova/access-and-admin.md)
 
 ---
 
-## 3. Versioning Model
+## Standards
 
-The documentation follows a **centralized versioning model**:
+Rules and best practices for naming, lifecycle, Git, and documentation.
 
-- The current architecture version is defined **only in this file**
-- All design documents implicitly inherit this version
-- Version changes are summarized in `CHANGELOG.md`
-
-### Version Semantics
-
-- **MAJOR version change (X.0)**
-
-  - Fundamental architectural changes
-  - Node role changes
-  - Virtualization or orchestration model changes
-
-- **MINOR version change (1.X)**
-
-  - New sections added
-  - Clarifications or refinements
-  - Tooling additions without architectural impact
-
-Runbooks are not strictly versioned; they evolve continuously.
+- [Naming Conventions](docs/standards/naming-conventions.md)
+- [Container Lifecycle](docs/standards/container-lifecycle.md)
+- [Git Workflow](docs/standards/git-workflow.md)
+- [Documentation Rules](docs/standards/documentation-rules.md)
 
 ---
 
-## 4. Document Structure
+## Architectural Decisions (ADRs)
 
-The repository is structured as follows:
+Documented decisions with reasoning and consequences.
 
-- `docs/design/` – Stable, high-level architecture and strategy
-- `docs/runbooks/` – Step-by-step operational procedures
-- `docs/decisions/` – Architecture Decision Records (ADR)
-- `docs/standards/` – Naming, workflow, and lifecycle rules
-
-Each folder has a clearly defined purpose and should not be misused.
+- [ADR 0001 – Docker in LXC](docs/decisions/adr-0001-docker-in-lxc.md)
+- [ADR 0002 – No Full VMs](docs/decisions/adr-0002-no-vms.md)
+- [ADR 0003 – Storage Layout](docs/decisions/adr-0003-storage-layout.md)
 
 ---
 
-## 5. Authoritative Design Reference
+## Glossary
 
-The authoritative architecture definition is located at:
-
-- `docs/design/01-architecture.md`
-
-All implementation guides, runbooks, and decisions must align with that document.
+- [Glossary](docs/glossary.md) – Definitions and abbreviations used throughout documentation
 
 ---
 
-## 6. Change Discipline
+## Changelog
 
-All meaningful changes to architecture or standards must:
-
-1. Be reflected in the relevant design document
-2. Update the version here if required
-3. Be recorded in `CHANGELOG.md`
-
-Ad-hoc or undocumented changes are explicitly discouraged.
+- [CHANGELOG](CHANGELOG.md) – Version history of documentation
 
 ---
 
-## 7. Intended Audience
+## Contribution Guidelines
 
-This documentation is written for:
-
-- The system owner (primary)
-- A future version of the system owner
-- Any technically competent operator who needs to understand or rebuild the system
-
-It assumes basic familiarity with Linux, Docker, and Git.
-
----
-
-## 8. Stability Statement
-
-Architecture Version **1.0** represents a **stable baseline**. Changes beyond this point should be incremental and intentional.
-
-This overview file acts as the **contract** between design and implementation.
+1. **Clone the repository**
+2. **Create a branch** for your changes:
+   ```bash
+   git checkout -b feature/<topic>
+   ```
