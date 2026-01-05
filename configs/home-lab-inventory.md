@@ -1,52 +1,58 @@
 # Home Lab Inventory & Config Reference
 
+> Status: Phase 1 (Day-0 Infrastructure) — VALIDATED  
+> This document represents the current, deployed state of the home lab.
+
+---
+
 ## Nodes
 
-| Node    | Hostname | OS         | IP Address    | Role/Notes                    |
-| ------- | -------- | ---------- | ------------- | ----------------------------- |
-| Dev PC  | Lyra     | Fedora     | 192.168.8.101 | Development workstation       |
-| Proxmox | Proxima  | Proxmox    | 192.168.8.102 | Container host (LXC + Docker) |
-| Laptop  | Nova     | Windows 11 | 192.168.8.103 | Admin / remote work           |
-| OMV     | Rhea     | OMV        | 192.168.8.104 | Media server / file sharing   |
+| Node    | Hostname | OS         | IP Address   | Role / Scope                                                         |
+| ------- | -------- | ---------- | ------------ | -------------------------------------------------------------------- |
+| Dev PC  | lyra     | Fedora     | 192.168.8.10 | Development workstation, infra authoring, SSH control node           |
+| Proxmox | proxima  | Proxmox VE | 192.168.8.20 | Compute host (LXC-first strategy). No application logic on host      |
+| Laptop  | nova     | Windows 11 | 192.168.8.30 | Ops endpoint: documentation, monitoring access, client communication |
+| OMV     | rhea     | OMV        | 192.168.8.50 | Storage backbone: persistent data, stateful services only            |
 
 ---
 
-## LXC Containers on Proxima
+## Network
 
-| Container Name    | Class   | Service / Role          | Docker Inside? | Persistent Volume          | Notes                   |
-| ----------------- | ------- | ----------------------- | -------------- | -------------------------- | ----------------------- |
-| core-git-01       | Core    | Gitea / Forgejo         | Yes            | proxima-core-git-vol       | Main local Git server   |
-| monitor-uptime-01 | Monitor | Uptime Kuma             | Yes            | proxima-monitor-uptime-vol | Monitoring dashboard    |
-| monitor-pulse-01  | Monitor | Pulse                   | Yes            | proxima-monitor-pulse-vol  | Observability           |
-| sandbox-test-01   | Sandbox | Experimental containers | Yes            | ephemeral                  | Temporary / dev testing |
-
----
-
-## Docker Ports & Mapping
-
-| Container         | Service | Host Port | Container Port | Notes        |
-| ----------------- | ------- | --------- | -------------- | ------------ |
-| core-git-01       | Gitea   | 3000      | 3000           | Web UI       |
-| core-git-01       | SSH     | 2222      | 22             | Git over SSH |
-| monitor-uptime-01 | Web UI  | 8081      | 3001           | Dashboard    |
-| monitor-pulse-01  | Web UI  | 8082      | 3000           | Dashboard    |
+- All nodes are on the same LAN subnet: `192.168.8.0/24`
+- IP addresses are statically assigned via router DHCP reservations
+- Hostname resolution:
+  - Router DNS (primary)
+  - `/etc/hosts` entries (bootstrap / fallback)
 
 ---
 
-## Volumes
+## Access Model (High-Level)
 
-| Volume Name                | Host Path                       | Usage                 |
-| -------------------------- | ------------------------------- | --------------------- |
-| proxima-core-git-vol       | /mnt/pve/toshiba/core-git       | Persistent Git data   |
-| proxima-monitor-uptime-vol | /mnt/pve/toshiba/monitor-uptime | Monitoring data       |
-| proxima-monitor-pulse-vol  | /mnt/pve/toshiba/monitor-pulse  | Observability metrics |
+- **Lyra**
+  - SSH access to all nodes
+  - Git and configuration authority
+- **Nova**
+  - Read-only / administrative access
+  - No infrastructure control
+- **Proxima & Rhea**
+  - No lateral SSH trust between servers
+  - Root SSH disabled (console-only where applicable)
+
+---
+
+## Storage (Current State)
+
+- Physical disks mounted and configured on **Rhea**
+- No network mounts consumed by Proxima yet
+- No application volumes in active use
 
 ---
 
 ## Notes
 
-- IPs are **local LAN addresses**; update if network changes
-- Ports are **mapped from container → host**; can be adjusted in runbooks
-- Volumes should follow **naming-conventions** and backup rules
-- This file is **for internal reference only**; do not commit sensitive credentials
-- Update whenever a new container, service, or host is added
+- This file reflects **current deployed reality**, not future plans
+- Planned containers, ports, and volumes are documented elsewhere
+- Update this file only when:
+  - A node is added/removed
+  - An IP or role changes
+  - Phase completion is validated

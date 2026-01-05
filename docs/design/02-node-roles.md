@@ -3,11 +3,14 @@
 ## Document Context
 
 This document defines **explicit responsibilities and boundaries** for each
-node in the homelab.  
+node in the homelab.
+
 It builds on `01-architecture.md` and inherits scope and intent from
 `00-overview.md`.
 
 This file exists to eliminate ambiguity about **what runs where and why**.
+
+> Status: Phase 1 (Day-0 Infrastructure) — Roles validated against deployed reality
 
 ---
 
@@ -31,7 +34,7 @@ until the architecture is revisited.
 
 **Primary Role**
 
-- Code authoring and local development
+- Development control node and code authoring environment
 
 **Responsibilities**
 
@@ -39,11 +42,12 @@ until the architecture is revisited.
 - Running local Docker containers for development and testing
 - Building and validating container images
 - Performing Git operations (commit, push, pull)
+- Acting as SSH control node for infrastructure access
 
 **Explicit Non-Responsibilities**
 
 - No long-running services
-- No production-like workloads
+- No production or production-like workloads
 - No persistent infrastructure state
 - No monitoring or orchestration services
 
@@ -52,78 +56,86 @@ perspective.
 
 ---
 
-### Proxima — Runtime & Service Host
+### Proxima — Compute & Runtime Host
 
 **Primary Role**
 
-- Hosting all persistent development-related services
+- Hosting all persistent, production-like development services
 
 **Responsibilities**
 
 - Running LXC containers
-- Providing Docker runtime inside LXC
-- Hosting Git services (local)
-- Hosting monitoring and observability tools
-- Maintaining persistent container volumes
+- Providing Docker runtime inside LXC containers
+- Hosting shared services (e.g., Git, monitoring, internal tools)
+- Maintaining runtime isolation and resource governance
+- Integrating with external storage providers (Rhea)
 
 **Explicit Non-Responsibilities**
 
-- No application workloads on the Proxmox host
+- No application logic on the Proxmox host itself
 - No developer-facing code editing
-- No experimental or ad-hoc containers outside defined services
+- No ad-hoc or experimental workloads outside defined containers
 
-Proxima is the **authoritative runtime environment**.
+Proxima is the **authoritative runtime and execution environment**.
 
 ---
 
-### Nova — Access & Mobility Node
+### Nova — Operations & Access Node
 
 **Primary Role**
 
-- Administrative and development access
+- Human-facing operations, access, and visibility
 
 **Responsibilities**
 
+- Documentation authoring and review
 - Accessing services hosted on Proxima
-- Performing remote administration
-- Acting as a fallback development access point
+- Client communication (Teams, Skype, AnyDesk)
+- Monitoring dashboards (web/UI access only)
+- Emergency or fallback administrative access
 
 **Explicit Non-Responsibilities**
 
 - No Docker runtime
+- No containers or virtual machines
 - No persistent services
-- No authoritative data storage
+- No infrastructure authority or secrets management
 
-Nova is an **interface**, not infrastructure.
+Nova is an **operations interface**, not part of the compute fabric.
 
 ---
 
-### Rhea — Storage & Media Node
+### Rhea — Storage & Stateful Services Node
 
 **Primary Role**
 
-- Media and file storage
+- Storage backbone and stateful service host
 
 **Responsibilities**
 
-- Media services (Plex, Jellyfin)
+- Persistent data storage
+- Media services (e.g., Plex, Jellyfin)
 - File sharing
+- Hosting stateful Docker services where appropriate
+- Providing mounted storage to Proxima workloads
 
 **Explicit Non-Responsibilities**
 
 - No development tooling
-- No Git services
-- No monitoring or infrastructure workloads
+- No Git or CI services
+- No monitoring or orchestration authority
+- No experimental workloads
 
-Rhea is **logically isolated** from the development stack.
+Rhea prioritizes **data integrity and stability** over flexibility.
 
 ---
 
 ## Cross-Node Interaction Rules
 
-- Lyra and Nova may access services on Proxima
-- Proxima does not depend on Lyra or Nova for runtime
-- Development workflows must function even if Rhea is unavailable
+- Lyra and Nova may access services hosted on Proxima
+- Proxima does not depend on Lyra or Nova for runtime operation
+- Proxima may depend on Rhea for persistent storage
+- Nova never acts as a dependency for any runtime workload
 - No node assumes responsibilities of another node during failure
 
 ---

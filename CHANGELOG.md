@@ -1,5 +1,3 @@
-# Changelog
-
 All notable changes to the homelab documentation repository are
 recorded in this file. Follow **semantic versioning** and date entries.
 
@@ -45,7 +43,28 @@ recorded in this file. Follow **semantic versioning** and date entries.
 
 - Initial version; no prior changes
 
+---
+
+## [1.1.0] – 2026-01-05
+
+### Added / Updated
+
+- **Phase 1 – Day-0 Infrastructure Deployment**:
+
+  - Inventory (`configs/home-lab-inventory.md`) updated with verified IPs and roles
+  - Node roles (`docs/design/02-node-roles.md`) updated to reflect locked responsibilities
+  - Networking (`docs/design/03-networking.md`) updated with confirmed IP assignments
+  - Runbooks updated to reflect as-built state:
+    - Proxima: `baseline-setup.md` (host ready, storage recognized, SSH tested)
+    - Nova: `access-and-admin.md` (access, monitoring, and boundaries verified)
+  - Phase 1 status markers added to all files for clarity
+  - Documentation reflects **current deployed reality**, not planned future state
+
 ### Notes
 
-- Repository structure finalized
-- Version 1.0.0 reflects complete baseline documentation of the homelab
+- Phase 1 completes **baseline validation**:
+  - Node hostnames, IPs, and connectivity verified
+  - SSH trust model implemented
+  - Minimal host setups confirmed
+  - No containers or services deployed yet
+- Provides a **stable foundation** for Phase 2 (storage mounts and container deployment)

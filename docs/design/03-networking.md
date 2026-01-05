@@ -14,6 +14,8 @@ It builds on:
 This file describes **connectivity expectations and boundaries**, not physical
 topology or configuration steps.
 
+> Status: Phase 1 (Day-0 Infrastructure) — Node IPs and connectivity validated
+
 ---
 
 ## Networking Design Goals
@@ -49,6 +51,7 @@ Security is achieved primarily through **non-exposure**, not perimeter defense.
 - Acts as a client on the network
 - Initiates outbound connections to services
 - Does not accept inbound service traffic
+- **Static IP:** 192.168.8.10
 
 Lyra is a **consumer**, not a provider.
 
@@ -59,6 +62,7 @@ Lyra is a **consumer**, not a provider.
 - Acts as the primary service endpoint
 - Hosts internal-facing services
 - Accepts inbound connections from trusted nodes only
+- **Static IP:** 192.168.8.20
 
 Proxima is the **center of gravity** for service traffic.
 
@@ -69,6 +73,7 @@ Proxima is the **center of gravity** for service traffic.
 - Acts as a mobile client
 - Initiates connections for administration and access
 - Does not provide services
+- **Static IP:** 192.168.8.30
 
 Nova mirrors Lyra’s network posture with fewer responsibilities.
 
@@ -79,6 +84,7 @@ Nova mirrors Lyra’s network posture with fewer responsibilities.
 - Provides media and file services
 - Operates independently from development services
 - Has no required dependency on Proxima or Lyra
+- **Static IP:** 192.168.8.50
 
 Rhea remains network-adjacent but logically separate.
 
@@ -131,4 +137,4 @@ The networking model prioritizes:
 - Internal trust over public exposure
 - Stability over experimentation
 
-This keeps the system understandable and safe as it grows.
+**Current Deployment Status:** Phase 1 completed, IPs validated, nodes reachable and resolvable by hostname.

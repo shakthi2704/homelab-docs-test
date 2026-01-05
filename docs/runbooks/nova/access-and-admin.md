@@ -1,10 +1,11 @@
 # Runbook – Nova Access and Administration
 
+> Status: Phase 1 (Day-0 Infrastructure) — Role and access validated
+
 ## Purpose
 
 This runbook defines the **access, administration, and operational boundaries**
-for Nova (Windows 11 workstation) within the homelab and development
-infrastructure.
+for Nova (Windows 11 workstation) within the homelab.
 
 It ensures Nova is used safely for administrative tasks and monitoring without
 impacting Lyra, Proxima, or Rhea.
@@ -14,9 +15,9 @@ impacting Lyra, Proxima, or Rhea.
 ## Scope
 
 - Nova workstation operations
-- Administrative access to Proxima and Lyra
-- Access to monitoring dashboards
-- Temporary local development tools
+- Administrative access to Proxima and Lyra (SSH / RDP)
+- Access to monitoring dashboards (read-only)
+- Temporary local documentation or non-critical tools
 
 Out of scope:
 
@@ -32,53 +33,56 @@ Out of scope:
 
    - Administrative access only where required
    - Standard user for daily tasks
-   - Elevated privileges for maintenance or configuration
+   - Elevated privileges only for authorized maintenance or configuration
 
 2. **Scoped Responsibilities**
 
-   - Nova can manage, monitor, or access nodes, but not host containers
-   - No persistent data storage on Nova affecting core infrastructure
+   - Nova can access nodes and monitor services
+   - Cannot host containers or manage persistent data
+   - No authority over core infrastructure
 
 3. **Isolation**
 
-   - Tools and access from Nova must not interfere with Proxima LXC containers
-   - Development workflows are strictly on Lyra
+   - Tools and access from Nova must **not interfere** with Proxima or Lyra
+   - Development workflows remain strictly on Lyra
 
 4. **Observability**
-   - Nova may be used for monitoring dashboards or remote access
+
+   - Nova is used for monitoring dashboards or remote administrative access
    - Read-only access preferred where possible
 
 ---
 
-## Administrative Workflow
+## Administrative Workflow (Phase 1 Validated)
 
 1. **Access Nodes**
 
-   - Use secure, trusted methods to connect to Lyra, Proxima, or Rhea
-   - Verify identity and connection before performing any action
+   - Use secure, trusted methods (SSH / RDP) to connect to Lyra, Proxima, or Rhea
+   - Verify identity and connection before any action
 
 2. **Monitoring & Troubleshooting**
 
    - Observe service status and logs
-   - Use Nova as an administrative console only
+   - Nova serves only as an administrative console
 
 3. **Maintenance Tasks**
 
-   - Limited to node configuration, backup triggers, or orchestration
+   - Limited to configuration, backup triggers, or reading dashboards
    - Must follow documented runbooks and ADRs
 
 4. **User Management**
-   - Only create or manage accounts if authorized
-   - Maintain audit trail for any changes
+
+   - Only create or manage accounts if explicitly authorized
+   - Maintain audit trail for all changes
 
 ---
 
 ## Operational Boundaries
 
-- Nova does not host services or containers
+- Nova **does not host services or containers**
 - No persistent storage of critical data
 - Limited impact in case of compromise
-- Acts as administrative, monitoring, and access node only
+- Acts solely as **administrative, monitoring, and access node**
 
 ---
 
@@ -86,4 +90,5 @@ Out of scope:
 
 - Nova is a **low-risk administrative node**
 - All access and changes must be documented
-- Any deviation from workflow requires ADR
+- Any deviation from workflow requires an ADR
+- **Phase 1 verified:** role, connectivity, and access confirmed; no infra changes performed
