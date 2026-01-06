@@ -93,3 +93,32 @@ recorded in this file. Follow **semantic versioning** and date entries.
 - Docker lifecycle rules enforced: create → promote → operate → retire
 - Gitea is running with web UI accessible (`3000`) and SSH Git (`2222`)
 - Documentation now represents **current deployed state of core services** within LXC
+
+---
+
+## [1.3.0] – 2026-01-06
+
+### Added / Updated
+
+- **Phase 3 – Monitoring & Observability LXC Deployment**:
+
+  - Inventory (`configs/home-lab-inventory.md`) updated with **monitor-services LXC**:
+    - IP: `192.168.8.22`
+    - Role: Docker host for monitoring stack
+  - Runbooks updated:
+    - Proxima: `docker-runtime.md` now includes **Uptime Kuma, Pulse, and Dozzle deployments**
+    - Persistent volumes: `uptime-kuma-data`, `pulse-data`, `dozzle-data`
+    - Docker container health and monitoring integration verified
+  - LXC container `monitor-services` created on Proxima using Ubuntu 22.04 template
+  - Docker runtime verified and active inside `monitor-services` container
+  - Networking configured with `veth`, static IP assignment, firewall disabled for container
+  - Phase 3 status markers added to all files for clarity
+
+### Notes
+
+- Phase 3 reflects **live deployment of monitoring stack**:
+  - Uptime Kuma accessible on `8081`
+  - Pulse accessible on `8082`
+  - Dozzle accessible on `8083` (optional logs view)
+- Observability and monitoring workflow fully integrated with LXC containers
+- Documentation now represents **current deployed state of core and monitoring services** within Proxima LXC
