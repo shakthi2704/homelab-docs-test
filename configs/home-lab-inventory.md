@@ -1,6 +1,6 @@
 # Home Lab Inventory & Config Reference
 
-> Status: Phase 2 (Core Services LXC deployed) — VALIDATED  
+> Status: Phase 3 (Core Services & Monitoring LXC deployed) — VALIDATED  
 > This document represents the current, deployed state of the home lab.
 
 ---
@@ -18,9 +18,10 @@
 
 ## LXC Containers on Proxima
 
-| Container Name | Class | Service / Role | Docker Inside? | Persistent Volume | IP Address   | Notes                                       |
-| -------------- | ----- | -------------- | -------------- | ----------------- | ------------ | ------------------------------------------- |
-| core-services  | Core  | Docker host    | Yes            | proxima-core-vol  | 192.168.8.21 | Hosts Gitea (admin email: lyra@proxima.com) |
+| Container Name   | Class      | Service / Role                   | Docker Inside? | Persistent Volume(s)                      | IP Address   | Notes                                                                          |
+| ---------------- | ---------- | -------------------------------- | -------------- | ----------------------------------------- | ------------ | ------------------------------------------------------------------------------ |
+| core-services    | Core       | Docker host / developer tools    | Yes            | proxima-core-vol                          | 192.168.8.21 | Hosts Gitea (admin email: lyra@proxima.com)                                    |
+| monitor-services | Monitoring | Monitoring / observability stack | Yes            | uptime-kuma-data, pulse-data, dozzle-data | 192.168.8.22 | Hosts Uptime Kuma, Pulse, Dozzle; LXC nested Docker enabled; firewall disabled |
 
 ---
 
@@ -31,6 +32,11 @@
 - Hostname resolution:
   - Router DNS (primary)
   - `/etc/hosts` entries (bootstrap / fallback)
+- LXC containers have individual IPs and exposed ports for each service:
+  - `monitor-services`:
+    - Uptime Kuma → `8081`
+    - Pulse → `8082`
+    - Dozzle → `8083`
 
 ---
 
@@ -45,12 +51,19 @@
 - **Proxima & Rhea**
   - No lateral SSH trust between servers
   - Root SSH disabled on host (console-only where applicable)
+- **Container Access**
+  - Monitoring services and core services can be accessed via container SSH or host `pct enter <vmid>` commands
 
 ---
 
 ## Storage (Current State)
 
-- `pve-data` 1TB HDD used for **core-services LXC root disk and future container volumes**
+- `pve-data` 1TB HDD used for **core-services & monitoring LXC root disks and persistent Docker volumes**
+- Persistent Docker volumes:
+  - `proxima-core-vol` → core services (Gitea)
+  - `uptime-kuma-data` → Uptime Kuma database
+  - `pulse-data` → Pulse configuration & metrics
+  - `dozzle-data` → Dozzle logs (optional)
 - `/mnt/pve/toshiba` mount exists but **not yet used**
 - No network mounts from Rhea consumed yet
 
@@ -58,11 +71,13 @@
 
 ## Notes
 
-- This file reflects **current deployed reality** (Phase 2)
+- This file reflects **current deployed reality** (Phase 3)
 - `core-services` now runs **Gitea** with admin email: `lyra@proxima.com`
-- Planned containers, ports, and volumes are documented elsewhere
+- `monitor-services` hosts monitoring stack: **Uptime Kuma, Pulse, Dozzle**
+- IPs, volumes, and services should match `docker-runtime.md` and `service-deployment.md`
 - Update this file only when:
   - A node is added/removed
   - An IP or role changes
   - A container is created or removed
+  - Persistent volumes are added/modified
   - Phase completion is validated
