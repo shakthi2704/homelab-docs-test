@@ -1,6 +1,6 @@
 # Home Lab Inventory & Config Reference
 
-> Status: Phase 1 (Day-0 Infrastructure) — VALIDATED  
+> Status: Phase 2 (Core Services LXC deployed) — VALIDATED  
 > This document represents the current, deployed state of the home lab.
 
 ---
@@ -16,9 +16,17 @@
 
 ---
 
+## LXC Containers on Proxima
+
+| Container Name | Class | Service / Role | Docker Inside? | Persistent Volume | IP Address   | Notes                                       |
+| -------------- | ----- | -------------- | -------------- | ----------------- | ------------ | ------------------------------------------- |
+| core-services  | Core  | Docker host    | Yes            | proxima-core-vol  | 192.168.8.21 | Hosts Gitea (admin email: lyra@proxima.com) |
+
+---
+
 ## Network
 
-- All nodes are on the same LAN subnet: `192.168.8.0/24`
+- All nodes and containers are on the same LAN subnet: `192.168.8.0/24`
 - IP addresses are statically assigned via router DHCP reservations
 - Hostname resolution:
   - Router DNS (primary)
@@ -29,30 +37,32 @@
 ## Access Model (High-Level)
 
 - **Lyra**
-  - SSH access to all nodes
+  - SSH access to all nodes and LXC containers
   - Git and configuration authority
 - **Nova**
   - Read-only / administrative access
   - No infrastructure control
 - **Proxima & Rhea**
   - No lateral SSH trust between servers
-  - Root SSH disabled (console-only where applicable)
+  - Root SSH disabled on host (console-only where applicable)
 
 ---
 
 ## Storage (Current State)
 
-- Physical disks mounted and configured on **Rhea**
-- No network mounts consumed by Proxima yet
-- No application volumes in active use
+- `pve-data` 1TB HDD used for **core-services LXC root disk and future container volumes**
+- `/mnt/pve/toshiba` mount exists but **not yet used**
+- No network mounts from Rhea consumed yet
 
 ---
 
 ## Notes
 
-- This file reflects **current deployed reality**, not future plans
+- This file reflects **current deployed reality** (Phase 2)
+- `core-services` now runs **Gitea** with admin email: `lyra@proxima.com`
 - Planned containers, ports, and volumes are documented elsewhere
 - Update this file only when:
   - A node is added/removed
   - An IP or role changes
+  - A container is created or removed
   - Phase completion is validated

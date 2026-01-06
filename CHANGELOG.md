@@ -68,3 +68,28 @@ recorded in this file. Follow **semantic versioning** and date entries.
   - Minimal host setups confirmed
   - No containers or services deployed yet
 - Provides a **stable foundation** for Phase 2 (storage mounts and container deployment)
+
+---
+
+## [1.2.0] – 2026-01-06
+
+### Added / Updated
+
+- **Phase 2 – Core Services LXC Deployment**:
+
+  - Inventory (`configs/home-lab-inventory.md`) updated with **core-services LXC**:
+    - IP: `192.168.8.21`
+    - Role: Docker host for Gitea and future containers
+  - Runbooks updated:
+    - Proxima: `docker-runtime.md` now includes **Gitea deployment** with admin email `lyra@proxima.com`
+  - LXC container `core-services` created on Proxima using Ubuntu 22.04 template
+  - Docker runtime verified and active inside `core-services` container
+  - Volumes created for persistent service data (`proxima-core-vol`)
+  - Phase 2 status markers added to all files for clarity
+
+### Notes
+
+- Phase 2 reflects **live container deployment** for core services
+- Docker lifecycle rules enforced: create → promote → operate → retire
+- Gitea is running with web UI accessible (`3000`) and SSH Git (`2222`)
+- Documentation now represents **current deployed state of core services** within LXC

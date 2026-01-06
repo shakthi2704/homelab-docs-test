@@ -63,46 +63,32 @@ Out of scope:
 - Persistent workloads
 - Examples: Git services, CI services, developer tools
 
-### 2. Monitoring & Observability
+#### Example: Gitea Deployment
 
-- Observes other containers
-- Does not affect service state
-- Examples: Uptime monitoring, dashboards, log aggregation
+**Container:** `core-services`  
+**Role:** Git service (self-hosted)  
+**Admin Email:** `lyra@proxima.com`  
+**Ports:**
 
-### 3. Experimental / Sandbox
+- Web UI: `3000` → access via `http://192.168.8.21:3000`
+- SSH: `2222` → Git over SSH
 
-- Short-lived, isolated
-- No critical data
-- Used for testing, learning, or evaluation
+**Persistent Volumes:**
 
----
+```text
+/srv/gitea/data   → Git repositories
+/srv/gitea/config → Gitea configuration
+/srv/gitea/logs   → Logs
+```
 
-## Resource Management
+#### Gitea container deployment snippet
 
-- CPU, memory, and storage allocated at LXC level
-- Docker containers inherit LXC limits
-- Over-provisioning avoided
-- Monitoring containers prioritized for visibility
-
----
-
-## Lifecycle Rules
-
-1. **Create**
-   - Docker container built and assigned class inside LXC
-2. **Promote**
-   - Validated containers moved from experimental to core or monitoring
-3. **Operate**
-   - Containers monitored, updated, and maintained
-4. **Retire**
-   - Containers removed
-   - Volumes archived or deleted based on policy
-
----
-
-## Notes
-
-- Running Docker outside LXC is forbidden
-- All Docker workloads must follow lifecycle and class rules
-- Observability and isolation are mandatory
-- Deviations require an ADR
+docker run -d \
+ --name gitea \
+ -p 3000:3000 \
+ -p 2222:22 \
+ -v /srv/gitea/data:/data \
+ -v /srv/gitea/config:/etc/gitea \
+ -v /srv/gitea/logs:/var/log/gitea \
+ --restart unless-stopped \
+ gitea/gitea:latest
