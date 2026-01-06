@@ -7,77 +7,75 @@
 
 ## Nodes
 
-| Node    | Hostname | OS         | IP Address   | Role / Scope                                                         |
-| ------- | -------- | ---------- | ------------ | -------------------------------------------------------------------- |
-| Dev PC  | lyra     | Fedora     | 192.168.8.10 | Development workstation, infra authoring, SSH control node           |
-| Proxmox | proxima  | Proxmox VE | 192.168.8.20 | Compute host (LXC-first strategy). No application logic on host      |
-| Laptop  | nova     | Windows 11 | 192.168.8.30 | Ops endpoint: documentation, monitoring access, client communication |
-| OMV     | rhea     | OMV        | 192.168.8.50 | Storage backbone: persistent data, stateful services only            |
+| Node    | Hostname | OS         | IP Address   | Role / Scope                                                    |
+| ------- | -------- | ---------- | ------------ | --------------------------------------------------------------- |
+| Dev PC  | lyra     | Fedora     | 192.168.8.10 | Development workstation, infra authoring, SSH control node      |
+| Proxmox | proxima  | Proxmox VE | 192.168.8.20 | Compute host (LXC-first strategy). No application logic on host |
+| Laptop  | nova     | Windows 11 | 192.168.8.30 | Ops endpoint: documentation, monitoring access                  |
+| OMV     | rhea     | OMV        | 192.168.8.50 | Storage node (present, not yet consumed by Proxima)             |
 
 ---
 
-## LXC Containers on Proxima
+## LXC Containers on Proxima (Authoritative)
 
-| Container Name   | Class      | Service / Role                   | Docker Inside? | Persistent Volume(s)                      | IP Address   | Notes                                                                          |
-| ---------------- | ---------- | -------------------------------- | -------------- | ----------------------------------------- | ------------ | ------------------------------------------------------------------------------ |
-| core-services    | Core       | Docker host / developer tools    | Yes            | proxima-core-vol                          | 192.168.8.21 | Hosts Gitea (admin email: lyra@proxima.com)                                    |
-| monitor-services | Monitoring | Monitoring / observability stack | Yes            | uptime-kuma-data, pulse-data, dozzle-data | 192.168.8.22 | Hosts Uptime Kuma, Pulse, Dozzle; LXC nested Docker enabled; firewall disabled |
+| Container Name   | Class      | Role / Responsibility            | Docker Inside | Persistent Volume(s)                      | IP Address   | Notes                                |
+| ---------------- | ---------- | -------------------------------- | ------------- | ----------------------------------------- | ------------ | ------------------------------------ |
+| core-services    | Core       | Docker runtime only              | Yes           | proxima-core-vol                          | 192.168.8.21 | No application services deployed yet |
+| monitor-services | Monitoring | Observability & monitoring stack | Yes           | uptime-kuma-data, pulse-data, dozzle-data | 192.168.8.22 | Runs Uptime Kuma, Pulse, Dozzle      |
 
 ---
 
 ## Network
 
-- All nodes and containers are on the same LAN subnet: `192.168.8.0/24`
-- IP addresses are statically assigned via router DHCP reservations
+- All nodes and LXC containers are on `192.168.8.0/24`
+- IPs assigned via router DHCP reservations
 - Hostname resolution:
-  - Router DNS (primary)
-  - `/etc/hosts` entries (bootstrap / fallback)
-- LXC containers have individual IPs and exposed ports for each service:
-  - `monitor-services`:
-    - Uptime Kuma → `8081`
-    - Pulse → `8082`
-    - Dozzle → `8083`
+  - Router DNS
+  - `/etc/hosts` fallback
+
+### Service Exposure
+
+- Docker containers use **bridge networking inside LXC**
+- Ports are published on the **LXC IP**, not on the Proxmox host
+
+Monitoring services (`monitor-services` – `192.168.8.22`):
+
+- Uptime Kuma → `8081`
+- Pulse → `8082`
+- Dozzle → `8083`
 
 ---
 
-## Access Model (High-Level)
+## Access Model
 
 - **Lyra**
   - SSH access to all nodes and LXC containers
-  - Git and configuration authority
 - **Nova**
-  - Read-only / administrative access
-  - No infrastructure control
+  - Monitoring and documentation access only
 - **Proxima & Rhea**
-  - No lateral SSH trust between servers
-  - Root SSH disabled on host (console-only where applicable)
-- **Container Access**
-  - Monitoring services and core services can be accessed via container SSH or host `pct enter <vmid>` commands
+  - No lateral SSH trust
+  - Root SSH disabled on host
+- **LXC Access**
+  - SSH or `pct enter <vmid>`
 
 ---
 
-## Storage (Current State)
+## Storage
 
-- `pve-data` 1TB HDD used for **core-services & monitoring LXC root disks and persistent Docker volumes**
-- Persistent Docker volumes:
-  - `proxima-core-vol` → core services (Gitea)
-  - `uptime-kuma-data` → Uptime Kuma database
-  - `pulse-data` → Pulse configuration & metrics
-  - `dozzle-data` → Dozzle logs (optional)
-- `/mnt/pve/toshiba` mount exists but **not yet used**
-- No network mounts from Rhea consumed yet
+- `pve-data` (1TB HDD):
+  - LXC root disks
+  - Persistent Docker volumes
+- Active volumes:
+  - `proxima-core-vol`
+  - `uptime-kuma-data`
+  - `pulse-data`
+  - `dozzle-data`
+- `/mnt/pve/toshiba` exists but unused
+- No network mounts from Rhea consumed
 
 ---
 
 ## Notes
 
-- This file reflects **current deployed reality** (Phase 3)
-- `core-services` now runs **Gitea** with admin email: `lyra@proxima.com`
-- `monitor-services` hosts monitoring stack: **Uptime Kuma, Pulse, Dozzle**
-- IPs, volumes, and services should match `docker-runtime.md` and `service-deployment.md`
-- Update this file only when:
-  - A node is added/removed
-  - An IP or role changes
-  - A container is created or removed
-  - Persistent volumes are added/modified
-  - Phase completion is validated
+- Reflects deployed reality only
+- Update only when containers, IPs, or volumes change
