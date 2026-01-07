@@ -23,6 +23,11 @@
 | core-services    | Core       | Docker runtime only              | Yes           | proxima-core-vol                          | 192.168.8.21 | No application services deployed yet |
 | monitor-services | Monitoring | Observability & monitoring stack | Yes           | uptime-kuma-data, pulse-data, dozzle-data | 192.168.8.22 | Runs Uptime Kuma, Pulse, Dozzle      |
 
+| Container Name | Class | Role / Responsibility | Docker Inside | Persistent Volume(s) | IP Address   | Notes                                |
+| -------------- | ----- | --------------------- | ------------- | -------------------- | ------------ | ------------------------------------ |
+| drone-server   | Core  | CI/CD server          | Yes           | /srv/drone           | 192.168.8.21 | Web UI: 8080, connects to Gitea      |
+| drone-runner   | Core  | CI/CD runner          | Yes           | /srv/drone           | 192.168.8.21 | Executes pipelines for Docker stacks |
+
 ---
 
 ## Network

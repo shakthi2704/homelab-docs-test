@@ -38,16 +38,7 @@
 
 ---
 
-## 4. Network & Security
-
-- [ ] Route Gitea through reverse proxy (Traefik / Nginx Proxy Manager)
-- [ ] Enable HTTPS / TLS certificates
-- [ ] Limit external access if not required (firewall / port exposure)
-- [ ] Optionally enable fail2ban / brute-force protection
-
----
-
-## 5. Backup & Recovery
+## 4. Backup & Recovery
 
 - [ ] Create backup routine for `/data` volume
 - [ ] Schedule LXC snapshots of core-services container
@@ -55,10 +46,3 @@
 - [ ] Document backup location, frequency, and retention policy
 
 ---
-
-## 6. Monitoring & Maintenance
-
-- [ ] Integrate Gitea container into Prometheus / Grafana monitoring
-- [ ] Enable container auto-update policy (manual for now)
-- [ ] Document version and update procedure
-- [ ] Schedule regular configuration reviews

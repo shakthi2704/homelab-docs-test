@@ -54,30 +54,38 @@ Semantic versioning and date-based entries are followed.
 
 ---
 
-## [1.4.0] – 2026-01-06
+## [1.4.0] – DEPLOYED – 2026-01-06
 
 ### Added / Updated
 
 - Phase 4: Core Services Hardening & Repository Organization
-- Gitea container deployed and configured:
-  - SSH-based Git access enforced for all users
-  - Admin accounts reviewed; strong password policy applied
-  - Public user registration disabled
-  - Default repository visibility set to private
-- Baseline repositories created inside `infra` organization:
-  - `infra-docs` → documentation, ADRs, runbooks
-  - `docker-stacks` → Docker Compose files and container stack definitions
-  - `home-lab-config` → LXC manifests, scripts, and home-lab configuration files
-- Existing homelab documentation migrated into `infra-docs` repository
-- Docker volume mapping and persistence verified for Gitea (`/srv/gitea/data` and `/srv/gitea/logs`)
-- Timezone, base URL, and logging settings verified and confirmed
+- Gitea container deployed and validated:
+  - SSH-based Git access verified
+  - Baseline repositories created
+  - Timezone, base URL, and logging verified
+  - Backup and restore procedures tested successfully
 - Repository structure and permissions reviewed
-- SSH key onboarding workflow documented for all users
-- Backup and persistence strategy verified
+- Docker volume mapping and persistence confirmed
+
+---
+
+## [1.5.0] – PLANNED
+
+### Planned
+
+- Phase 5: Advanced Services & Automation Planning
+- Reverse proxy selection (Traefik / Nginx Proxy Manager)
+- CI/CD runner strategy definition
+- Secrets and credentials management planning
+- Monitoring and alerting expansion planning
+- Backup and disaster recovery strategy design
+
+> Note: No Phase 5 services are deployed. This section reflects design intent only.
 
 ---
 
 ## Notes
 
-- Documentation reflects deployed reality only
-- No planned or speculative components are recorded
+- Documentation must always reflect **validated deployed reality**
+- Planned phases must never be marked as completed
+- Partial deployments require explicit validation before promotion
