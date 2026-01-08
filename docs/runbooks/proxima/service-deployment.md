@@ -10,7 +10,7 @@ on Proxima.
 ## Scope
 
 - Docker service deployment inside LXC
-- Monitoring integration
+- Monitoring services deployment (isolated LXC)
 - Lifecycle control
 
 Out of scope:
@@ -45,12 +45,20 @@ Characteristics:
 - Ports exposed via LXC IP
 - Persistent Docker volumes in use
 
+---
+
 ### Core Services (`core-services`)
 
-- Docker runtime only
-- No application services deployed yet
+- Gitea (Git service)
+- Drone CI/CD server
+- Drone Docker runner
 
----
+Characteristics:
+
+- Docker bridge networking
+- Ports exposed via LXC IP
+- Persistent Docker volumes for service data
+- CI/CD workloads isolated from monitoring stack
 
 ## Service Exposure Model
 
@@ -60,7 +68,7 @@ Characteristics:
 
 ---
 
-## Operational Rules
+## Operational Rulesvsvs
 
 - Monitoring services must not manage application state
 - Core services must not embed monitoring tooling
@@ -72,3 +80,5 @@ Characteristics:
 
 - This document reflects deployed services only
 - Future services are documented elsewhere after deployment
+- Secrets and credentials are governed by `secrets-credential-management.md`
+- All persistent infrastructure services MUST use restart: unless-stopped or equivalent Docker restart policy.

@@ -82,7 +82,27 @@ Semantic versioning and date-based entries are followed.
 
 > Note: No Phase 5 services are deployed. This section reflects design intent only.
 
+## [1.6.0] – 2026-01-07
+
+### Added / Updated
+
+- Phase 5 CI/CD runner deployed:
+  - Drone server container running
+  - Drone runner container running and connected
+  - Gitea repositories activated (`docker-stacks`, `home-lab-config`)
+  - `.drone.yml` pipelines created for repository automation
+
 ---
+
+## [1.7.0] – 2026-01-07
+
+### Added / Updated
+
+- Lyra node baseline setup completed:
+  - SSH access to Proxima host validated
+  - Documentation repo cloned and tested
+  - Optional Docker client tested
+- Runbooks for Lyra created and validated
 
 ## Notes
 

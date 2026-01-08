@@ -92,3 +92,30 @@ Out of scope:
 - All access and changes must be documented
 - Any deviation from workflow requires an ADR
 - **Phase 1 verified:** role, connectivity, and access confirmed; no infra changes performed
+
+# Nova – Access & Admin Runbook
+
+## Purpose
+
+Defines how Nova interacts with the home-lab environment.  
+Covers access to nodes, LXC containers, documentation, and optional Docker client usage.
+
+---
+
+## 1. Network & Connectivity
+
+- Nova IP: `192.168.8.30`
+- Confirm connectivity to home-lab nodes:
+  - `ping 192.168.8.20` → Proxima host
+  - `ping 192.168.8.21` → core-services LXC
+  - `ping 192.168.8.22` → monitor-services LXC
+
+---
+
+## 2. SSH Access
+
+- Nova SSH keys stored locally (if needed)
+- SSH into Proxima host (no root access to LXC):
+  ```powershell
+  ssh admin@192.168.8.20
+  ```

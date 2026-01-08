@@ -30,6 +30,39 @@
 
 ---
 
+## Phase 5 – Secrets & Credential Management
+
+**Node:** core-services (LXC)  
+**Purpose:** Securely manage sensitive credentials for Docker stacks and CI/CD pipelines
+
+---
+
+### Current Implementation
+
+- **Docker Secrets** used for sensitive data (passwords, API keys, tokens)
+- Secrets stored **inside Docker-managed volumes** (`/srv/docker-secrets` or container-specific paths)
+- No secrets stored in repository code or environment variables
+
+---
+
+### Example Secrets
+
+| Secret Name     | Purpose                     | Target Container / Service | Status  |
+| --------------- | --------------------------- | -------------------------- | ------- |
+| db_password     | Database password           | docker-stacks containers   | Created |
+| api_key         | External API authentication | home-lab-config pipelines  | Planned |
+| ssh_private_key | CI/CD Git operations        | Drone runner / pipelines   | Planned |
+
+---
+
+### Deployment Rules
+
+1. **Create secrets using Docker CLI:**
+
+```bash
+echo "YOUR_SECRET_VALUE" | docker secret create secret_name -
+
+
 ## Network
 
 - All nodes and LXC containers are on `192.168.8.0/24`
@@ -84,3 +117,4 @@ Monitoring services (`monitor-services` – `192.168.8.22`):
 
 - Reflects deployed reality only
 - Update only when containers, IPs, or volumes change
+```
