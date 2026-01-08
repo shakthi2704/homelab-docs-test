@@ -2,106 +2,85 @@
 
 ## Purpose
 
-This runbook defines the **management of LXC containers** on Proxima.  
-It ensures that all containers are created, classified, and maintained in a
-consistent and predictable manner.
-
-LXC containers are the foundation for all persistent services in the homelab.
+Defines how LXC containers are created and managed on Proxima.
+LXC containers are the authoritative runtime boundary.
 
 ---
 
 ## Scope
 
-- Creation of new LXC containers
-- Classification according to responsibility
-- Resource assignment and isolation
+- LXC creation and classification
+- Resource assignment
 - Lifecycle management
 
 Out of scope:
 
-- Container internals (Docker images, services)
-- Networking specifics (covered in `03-networking.md`)
-- Backup and recovery operations (covered in `07-backup-recovery.md`)
+- Docker internals
+- Service configuration
+- Backup and recovery
 
 ---
 
-## LXC Responsibility Classes
+## Responsibility Classes
 
-Each container must be assigned to a **single responsibility class**:
+### Core Services LXC
 
-1. **Core Services LXC**
+- Hosts Docker runtime for core services
+- Persistent by design
+- Currently deployed: `core-services`
 
-   - Hosts essential development infrastructure
-   - Examples: Git services, CI/CD services, foundational tooling
+### Monitoring LXC
 
-2. **Monitoring & Observability LXC**
-
-   - Hosts all observability, logging, and monitoring services
-   - Isolated from core service containers
-   - Observes but does not control state
-
-3. **Experimental / Sandbox LXC**
-   - Hosts isolated test or learning environments
-   - Must never contain authoritative data
-   - Can be safely deleted without consequence
+- Hosts observability tooling only
+- No control over application state
+- Currently deployed: `monitor-services`
 
 ---
 
-## LXC Lifecycle Management
+## Current LXC State
 
-All LXC containers follow this lifecycle:
+- Two LXC containers exist:
+  - `core-services` (Core)
+  - `monitor-services` (Monitoring)
+- Both use Ubuntu LXC templates
+- Docker runs **inside** each container
+- Docker is **forbidden on Proxmox host**
+
+---
+
+## Lifecycle Rules
 
 1. **Create**
 
-   - Assigned class at creation
-   - Storage and resource boundaries defined
+   - Assign class at creation
+   - Define storage and IP
 
 2. **Operate**
 
-   - Run container in isolation
-   - Respect class-specific boundaries
-   - Monitoring and observability as required
+   - Respect class boundaries
+   - No cross-container dependencies
 
 3. **Update**
 
-   - Maintenance only within class limits
-   - Changes documented in runbooks and ADRs if necessary
+   - Container-level updates only
+   - Document significant changes
 
 4. **Retire**
-   - Decommission container
-   - Remove persistent volumes if not needed
-   - Archive configuration if required
-
----
-
-## Resource Assignment
-
-Each LXC container must have:
-
-- Clear CPU, memory, and storage allocation
-- Access only to its assigned volumes
-- No cross-class volume sharing
-- Priority for core services if resources are limited
+   - Intentional decommission
+   - Remove volumes only if confirmed
 
 ---
 
 ## Isolation Rules
 
-- Containers of different classes must not interfere
-- Experimental containers must never compromise core or monitoring containers
-- All containers respect the host boundaries (no Docker on host)
-
----
-
-## Monitoring & Visibility
-
-- LXC containers should be observable from monitoring class containers
-- Failures must be detectable without impacting other classes
+- No service runs directly on Proxmox host
+- No cross-class volume sharing
+- Monitoring LXC observes but does not modify state
+- Core services remain isolated from monitoring logic
 
 ---
 
 ## Notes
 
-- Any deviation from class or lifecycle requires an ADR
-- LXC containers are the **authoritative runtime units** on Proxima
-- Proper management ensures predictable, maintainable infrastructure
+- Any deviation requires an ADR
+- LXC containers are treated as long-lived infrastructure units

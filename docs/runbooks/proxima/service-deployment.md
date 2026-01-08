@@ -2,103 +2,83 @@
 
 ## Purpose
 
-This runbook defines the **process for deploying services** inside Docker
-containers on Proxima, ensuring all deployments are consistent, isolated,
-and maintainable.
+Defines how Docker services are deployed inside existing LXC containers
+on Proxima.
 
 ---
 
 ## Scope
 
-- Deploying Dockerized services within LXC containers on Proxima
-- Observability and monitoring integration
-- Lifecycle compliance and class alignment
+- Docker service deployment inside LXC
+- Monitoring services deployment (isolated LXC)
+- Lifecycle control
 
 Out of scope:
 
-- Container creation (covered in `lxc-management.md`)
-- Docker runtime configuration (covered in `docker-runtime.md`)
-- Development or ephemeral deployment on Lyra or Nova
+- LXC creation
+- Docker engine configuration
+- Development or sandbox workloads
 
 ---
 
-## Service Deployment Principles
+## Deployment Rules
 
-1. **Class Alignment**
-
-   - Services must be deployed in the correct LXC container class
-   - Core services, monitoring, and experimental services must remain separate
-
-2. **Persistent State Management**
-
-   - Service data is externalized to Proxima storage
-   - Containers are replaceable without losing state
-
-3. **Observability**
-
-   - All services must integrate with monitoring containers
-   - Logs, metrics, and health status must be accessible
-
-4. **Promotion**
-
-   - New services are first validated in experimental containers (if needed)
-   - Approved services are promoted to the correct persistent LXC class
-
-5. **Operational Isolation**
-   - Services must not interfere with other containers
-   - Failures must be contained to the service scope
+- Services deploy **only inside existing LXC containers**
+- Correct class alignment is mandatory:
+  - Core services → `core-services`
+  - Monitoring services → `monitor-services`
+- Persistent data must use Docker volumes
 
 ---
 
-## Deployment Workflow
+## Current Deployed Services
 
-1. **Prepare Service**
+### Monitoring (`monitor-services`)
 
-   - Determine container image
-   - Identify persistent volumes
-   - Classify service (core, monitoring, experimental)
+- Uptime Kuma
+- Pulse
+- Dozzle
 
-2. **Deploy to LXC Container**
+Characteristics:
 
-   - Map volumes and resources
-   - Ensure service class isolation
-   - Enable observability hooks
-
-3. **Validate**
-
-   - Confirm service is running as intended
-   - Verify monitoring integration
-   - Ensure no dependency violations
-
-4. **Promote / Scale**
-
-   - Move validated service to production LXC class
-   - Scale containers if necessary
-   - Document promotion in runbook
-
-5. **Operate**
-
-   - Monitor health and metrics
-   - Apply updates according to lifecycle rules
-
-6. **Retire**
-   - Decommission service intentionally
-   - Archive data if needed
-   - Remove container cleanly
+- Docker bridge networking
+- Ports exposed via LXC IP
+- Persistent Docker volumes in use
 
 ---
 
-## Deployment Constraints
+### Core Services (`core-services`)
 
-- No core services in experimental LXC
-- No monitoring services in core LXC
-- Persistent data must remain on Proxima storage
-- All deployment changes must be documented
+- Gitea (Git service)
+- Drone CI/CD server
+- Drone Docker runner
+
+Characteristics:
+
+- Docker bridge networking
+- Ports exposed via LXC IP
+- Persistent Docker volumes for service data
+- CI/CD workloads isolated from monitoring stack
+
+## Service Exposure Model
+
+- Docker containers use bridge networking
+- Ports are published to the LXC interface
+- Services are accessed via `LXC_IP:PORT`
+
+---
+
+## Operational Rulesvsvs
+
+- Monitoring services must not manage application state
+- Core services must not embed monitoring tooling
+- All service changes must be intentional and documented
 
 ---
 
 ## Notes
 
-- Service deployment is **predictable and repeatable**
-- Deviations from the deployment process require an ADR
-- Observability, class alignment, and lifecycle rules ensure maintainable infrastructure
+- This document reflects deployed services only
+- Future services are documented elsewhere after deployment
+- Secrets and credentials are governed by `secrets-credential-management.md`
+- All persistent infrastructure services MUST use restart: unless-stopped or equivalent Docker restart policy.

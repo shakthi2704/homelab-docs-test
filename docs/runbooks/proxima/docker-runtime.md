@@ -2,9 +2,7 @@
 
 ## Purpose
 
-This runbook defines the **standards and procedures for running Docker** inside
-LXC containers on Proxima.
-
+This runbook defines the **standards and procedures for running Docker** inside LXC containers on Proxima.  
 It ensures all Docker workloads are consistent, isolated, and maintainable.
 
 ---
@@ -16,7 +14,7 @@ It ensures all Docker workloads are consistent, isolated, and maintainable.
 - Integration with monitoring and observability
 - Lifecycle management
 
-Out of scope:
+**Out of scope:**
 
 - Host-level Docker installation (forbidden)
 - Docker image design or build processes
@@ -45,8 +43,7 @@ Out of scope:
 
 4. **Service Class Alignment**
 
-   - Core services, monitoring, and experimental workloads have separate
-     containers
+   - Core services, monitoring, and experimental workloads have separate containers
    - No cross-class interference
 
 5. **Operational Boundaries**
@@ -63,46 +60,83 @@ Out of scope:
 - Persistent workloads
 - Examples: Git services, CI services, developer tools
 
-### 2. Monitoring & Observability
+**Example: Gitea Deployment**  
+**Container:** `core-services`  
+**Role:** Git service (self-hosted)  
+**Admin Email:** `lyra@proxima.com`
 
-- Observes other containers
-- Does not affect service state
-- Examples: Uptime monitoring, dashboards, log aggregation
+**Ports:**
 
-### 3. Experimental / Sandbox
+| Service | Container Port | Host Port | Notes                                 |
+| ------- | -------------- | --------- | ------------------------------------- |
+| Web UI  | 3000           | 3000      | Access via `http://192.168.8.21:3000` |
+| SSH     | 22             | 2222      | Git over SSH                          |
 
-- Short-lived, isolated
-- No critical data
-- Used for testing, learning, or evaluation
+**Persistent Volumes:**
 
----
+```text
+/srv/gitea/data   → Git repositories
+/srv/gitea/config → Gitea configuration
+/srv/gitea/logs   → Logs
+uptime-kuma-data  → stores Uptime Kuma database
+pulse-data        → stores Pulse configuration & metrics
+dozzle-data       → stores Dozzle logs (optional)
+```
 
-## Resource Management
+## Deployment Steps
 
-- CPU, memory, and storage allocated at LXC level
-- Docker containers inherit LXC limits
-- Over-provisioning avoided
-- Monitoring containers prioritized for visibility
+### 1. Core Services
 
----
+```text
+pct create 101 /var/lib/vz/template/cache/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
+  -hostname monitor-services \
+  -cores 2 \
+  -memory 2048 \
+  -swap 1024 \
+  -net0 name=eth0,bridge=vmbr0,ip=192.168.8.22/24,gw=192.168.8.1,firewall=0 \
+  -features nesting=1 \
+  -ostype ubuntu \
+  -unprivileged 1 \
+  -rootfs pve-data:30
 
-## Lifecycle Rules
+```
 
-1. **Create**
-   - Docker container built and assigned class inside LXC
-2. **Promote**
-   - Validated containers moved from experimental to core or monitoring
-3. **Operate**
-   - Containers monitored, updated, and maintained
-4. **Retire**
-   - Containers removed
-   - Volumes archived or deleted based on policy
+### 2. Deploy Core Services and Monitoring Containers:
 
----
+```text
+# Gitea
+docker run -d \
+  --name gitea \
+  -p 3000:3000 \
+  -p 2222:22 \
+  -v /srv/gitea/data:/data \
+  -v /srv/gitea/config:/etc/gitea \
+  -v /srv/gitea/logs:/var/log/gitea \
+  --restart unless-stopped \
+  gitea/gitea:latest
 
-## Notes
+# Uptime Kuma
+docker run -d \
+  --name uptime-kuma \
+  --restart unless-stopped \
+  -p 8081:3001 \
+  -v uptime-kuma-data:/app/data \
+  louislam/uptime-kuma
 
-- Running Docker outside LXC is forbidden
-- All Docker workloads must follow lifecycle and class rules
-- Observability and isolation are mandatory
-- Deviations require an ADR
+# Pulse
+docker run -d \
+  --name pulse \
+  --restart unless-stopped \
+  -p 8082:7655 \
+  -v pulse-data:/data \
+  rcourtman/pulse:latest
+
+# Dozzle
+docker run -d \
+  --name dozzle \
+  --restart unless-stopped \
+  -p 8083:8080 \
+  -v dozzle-data:/app/data \
+  amir20/dozzle:latest
+
+```

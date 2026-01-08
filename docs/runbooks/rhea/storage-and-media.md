@@ -178,5 +178,3 @@ Storage > Compute
 Predictability > Experimentation
 
 ---
-
-**End of document**
